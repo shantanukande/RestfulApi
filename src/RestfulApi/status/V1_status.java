@@ -1,7 +1,11 @@
 package RestfulApi.status;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.*;
+
+import RestfulApi.dao.RestDao;
+
+import java.sql.*;
 
 /**
  * This is the root path for our restful api service
@@ -50,5 +54,37 @@ public class V1_status {
 	public String returnVersion() {
 		return "<p>Version : </p>"+api_version;
 	}
-
+	
+	@Path("/database")
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	public String returnDatabaseStatus() throws Exception{
+		Connection conn = null;
+        PreparedStatement query = null;
+        String myString = null;
+        String returnString = null;
+        
+        try{
+        	conn = RestDao.MysqlConn();
+        	query = conn.prepareStatement("select current_date from dual");
+        	ResultSet rs = query.executeQuery();
+        	
+        	while(rs.next()){
+        		myString = rs.getString("current_date");
+        	}
+        	
+        	query.close();
+        	
+        	returnString = "<p>Database Status</p>"+
+        			"<p>Database current date : "+myString+"</p>";
+        }catch(Exception e) {
+        	e.printStackTrace();
+        }
+        finally{
+        	
+        }
+        
+        return returnString;
+        		
+	}
 }
